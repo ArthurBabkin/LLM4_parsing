@@ -1,0 +1,2 @@
+def vlad():
+    print('Vlad')
