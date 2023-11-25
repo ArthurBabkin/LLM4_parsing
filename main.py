@@ -1,0 +1,2 @@
+def art():
+    print("art")
