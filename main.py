@@ -9,11 +9,12 @@ limit = 500
 articles_arXiv_ID = set()
 articles_paper_ID = set()
 articles_titles = set()
+articles = []
 
 
-def get_mmd(url, title):
+def get_pdf(url: str, counter) -> None:
     html = requests.get(url)
-    pdf = open(f'C:/Users/{os.getlogin()}/Desktop/LLM4/DataScience/Articles/{title}.pdf', 'wb')
+    pdf = open(f'C:/Users/{os.getlogin()}/Desktop/LLM4/DataScience/Articles/{counter}.pdf', 'wb')
     pdf.write(html.content)
 
 def forward_snowballing_first_wave(counter_forward:int, api_url:str, api_text: dict, offset: int, limit:int) -> None:
@@ -53,15 +54,36 @@ def forward_snowballing_first_wave(counter_forward:int, api_url:str, api_text: d
                 else:
                     return
 
-    else:
-        return
+
+
+# Title, ArXiv, citationCount
+def backwards_snowballing():
+    url = ('https://api.semanticscholar.org/graph/v1/paper/204e3073870fae3d05bcbc2f6a8e263d9b72e776/references?fields'
+           '=title,citationCount,externalIds')
+    response = requests.get(url).json()
+
+    # getting articles from api
+    for item in response["data"]:
+        external_ids = item["citedPaper"]["externalIds"]
+        paper_id = "N/A"
+        if external_ids:
+            paper_id = external_ids.get("ArXiv", "N/A")
+
+        citation_count = item["citedPaper"]["citationCount"]
+        title = item["citedPaper"]["title"]
+        if citation_count and citation_count >= 10:
+            articles.append([title, paper_id, citation_count])
+
+
+
+backwards_snowballing()
 
 
 forward_snowballing_first_wave(0, "", None, 0, limit)
 
 list_articles_titles = list(articles_titles)
-list_articles_arXiv_ID= list(articles_arXiv_ID)
+list_articles_arXiv_ID = list(articles_arXiv_ID)
 
 print(list_articles_titles[0])
 for i in range(len(articles_arXiv_ID)):
-    get_mmd("https://arxiv.org//pdf/" + str(list_articles_arXiv_ID[i]) + ".pdf", str(i))
+    get_pdf("https://arxiv.org//pdf/" + str(list_articles_arXiv_ID[i]) + ".pdf", str(i))
