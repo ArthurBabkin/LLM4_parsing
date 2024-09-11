@@ -1,0 +1,1 @@
+Parsing of Archive.org articles, which are connected with each other by forward and backward citations. I found such such connections by parsing the articles from Semantic Scholar and make the backward and forward snowballing. Write me if you do not understand - I did not clean the final code)
